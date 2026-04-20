@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  cerise-frontend:
+    container_name: cerise-frontend
+    build:
+      context: "."
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_KC_URL: ${REACT_APP_KC_URL:-http://localhost:8080}
+        REACT_APP_KC_CLIENT_ID: ${REACT_APP_KC_CLIENT_ID:-cerise-frontend}
+        REACT_APP_BE_URL: ${REACT_APP_BE_URL:-http://localhost:8000}
+        REACT_APP_NAME: ${REACT_APP_NAME:-CERISE Frontend}
+    ports:
+      - '3000:3000'
+    stdin_open: true
