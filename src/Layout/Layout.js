@@ -19,6 +19,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import InfoIcon from '@mui/icons-material/Info';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 import { Main, AppBar, DrawerHeader, Footer } from '../components/LayoutComponents';
 import FooterContent from '../components/FooterContent';
@@ -69,6 +70,13 @@ export default function Layout({ children }) {
                 title: 'Candidate Search',
                 icon: <PersonSearchIcon sx={{ color: 'white' }} />,
                 path: '/candidate-search',
+            });
+        }
+        if (roles.includes('cerise-admin')) {
+            items.push({
+                title: 'Admin',
+                icon: <AdminPanelSettingsIcon sx={{ color: 'white' }} />,
+                path: '/admin',
             });
         }
         return items;

@@ -12,6 +12,24 @@ import CandidateSearch from "./pages/CandidateSearch";
 import StudentWalletDownload from "./components/StudentWallet/StudentWalletDownload";
 import { useEffect } from "react";
 import About from './pages/About';
+import AdminPanel from './pages/AdminPanel';
+import my_keycloak from "./Keycloak";
+
+// Web2learn 2026-10-30 (w2l: bearer token): the backend now requires a Keycloak token.
+// Attach a fresh access token to every API request (refresh if it expires within 30 s).
+axios.interceptors.request.use(async (config) => {
+    if (my_keycloak.authenticated) {
+        try {
+            await my_keycloak.updateToken(30);
+        } catch (e) {
+            my_keycloak.login();
+            return Promise.reject(e);
+        }
+        config.headers = config.headers || {};
+        config.headers.Authorization = `Bearer ${my_keycloak.token}`;
+    }
+    return config;
+});
 
 // Set primary color here
 let primary = 'rgba(65, 113, 63, 1)'
@@ -67,6 +85,7 @@ function App() {
                     <Route path="/register" element={<Register />} />
                     <Route path="/candidate-search" element={<CandidateSearch />} />
                     <Route path="/about" element={<About />} />
+                    <Route path="/admin" element={<AdminPanel />} />
                 </Routes>
             </Layout>
         </ThemeProvider>

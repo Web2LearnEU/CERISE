@@ -31,6 +31,7 @@ const Register = () => {
     });
     const [signUpSuccess, setSignUpSuccess] = useState(false);
     const [signUpError, setSignUpError] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');  // Web2learn 2026-10-30
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -94,10 +95,19 @@ const Register = () => {
             return;
         }
 
+        // Web2learn 2026-10-30: same rules as Keycloak's password policy
+        const pw = formData.password || '';
+        if (pw.length < 8) { setErrorMsg('Password must be at least 8 characters.'); setSignUpError(true); return; }
+        if ([formData.username, formData.email].some(v => v && v.toLowerCase() === pw.toLowerCase())) {
+            setErrorMsg('Password must not be your username or email.'); setSignUpError(true); return;
+        }
+        payload.username = (payload.username || '').trim().toLowerCase();
         try {
             const response = await axios.post(endpoint, payload);
             setSignUpSuccess(true);  // Trigger success snackbar
-        } catch {
+        } catch (err) {
+            const d = err?.response?.data;
+            setErrorMsg(d && typeof d === 'object' ? Object.values(d).join(' ') : 'Registration failed. Please check your input and try again.');
             setSignUpError(true);
         }
     };
@@ -124,8 +134,7 @@ const Register = () => {
                     label="User Type"
                 >
                     <MenuItem value="student">Student</MenuItem>
-                    <MenuItem value="recruiter">Recruiter</MenuItem>
-                    <MenuItem value="course_manager">Course Manager</MenuItem>
+                    {/* Web2learn 2026-10-30: course managers and recruiters are created by the CERISE admin */}
                 </Select>
             </FormControl>
 
@@ -176,6 +185,7 @@ const Register = () => {
                     value={formData.password}
                     onChange={handleChange}
                     required
+                    helperText="At least 8 characters, not your username or email"
                 />
 
                 {userType !== 'recruiter' && (
@@ -227,7 +237,7 @@ const Register = () => {
                 onClose={() => setSignUpError(false)}
             >
                 <Alert variant="filled" onClose={() => setSignUpError(false)} severity="error">
-                    Registration failed. Please check your input and try again.
+                    {errorMsg || 'Registration failed. Please check your input and try again.'}
                 </Alert>
             </Snackbar>
         </Container>
